@@ -5,6 +5,6 @@ See `Dockerfile`
 
 See scripts:
 - `./build`
-- './run`
-- './push'
+- `./run`
+- `./push`
 
