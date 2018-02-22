@@ -1,0 +1,15 @@
+#!/bin/bash -eu
+
+# Yell on unexepected pain
+set -eu
+set -o pipefail
+trap 'echo;echo "*** fail ***";echo' ERR
+
+docker run \
+     --sig-proxy=true \
+     --interactive \
+     --tty \
+     --cap-add=SYS_ADMIN \
+     --name=gsbasedev \
+     --rm \
+     hughsw/gsbase "$@"

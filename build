@@ -1,0 +1,8 @@
+#!/bin/bash -eu
+
+# Yell on unexepected pain
+set -eu
+set -o pipefail
+trap 'echo;echo "*** fail ***";echo' ERR
+
+docker build -t hughsw/gsbase .
