@@ -131,7 +131,7 @@ USER root:root
 #
 # See: https://github.com/docker/docker-install
 # Did:
-#   curl -fsSL test.docker.com -o test-docker.sh
+#   curl -fsSL get.docker.com -o get-docker.sh
 #   sh test-docker.sh --dry-run
 # Copied the '+' indicated outputs
 RUN true \
