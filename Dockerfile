@@ -9,10 +9,13 @@
 # Debian 9.x
 FROM debian:stretch
 
-# A tiny executable that pauses, great for putting after daemonizing commands
+# A tiny executable that pauses -- Useful for keeping a container
+# alive if commands daemonize themselves, by putting it at the end of
+# the startup script.
 COPY pause /
 
 # RUN echo && dpkg --list && echo 1
+
 
 RUN true \
     && apt-get update \
@@ -125,6 +128,12 @@ USER root:root
 # Install Docker CLI tools into image
 # Using them in a container requires mapping host engine socket into container: Risky!
 # See: https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface
+#
+# See: https://github.com/docker/docker-install
+# Did:
+#   curl -fsSL test.docker.com -o test-docker.sh
+#   sh test-docker.sh --dry-run
+# Copied the '+' indicated outputs
 RUN true \
     && curl -fsSL "https://download.docker.com/linux/debian/gpg" | apt-key add - \
     && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian  $(lsb_release -cs) stable" \
@@ -138,6 +147,8 @@ RUN true \
     && rm -r /var/lib/apt/lists/* \
     && true
 
+
+# Put nutritional info into GSBASE.txt
 RUN echo 'ver () { echo -n "$@" " : " >> GSBASE.txt && "$@" >> GSBASE.txt 2>&1 ; } \
   && touch GSBASE.txt \
   && ver date \
