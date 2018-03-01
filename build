@@ -3,6 +3,6 @@
 # Yell on unexepected pain
 set -eu
 set -o pipefail
-trap 'echo;echo "*** fail ***";echo' ERR
+trap 'echo;echo "*** fail ***  :  $0";echo' ERR
 
 docker build -t hughsw/gsbase .

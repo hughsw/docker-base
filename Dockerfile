@@ -19,19 +19,25 @@ RUN true \
     && apt-get install -y --no-install-recommends \
       apt-transport-https \
       apt-utils \
+      ca-certificates \
     && apt-get install -y --no-install-recommends \
       curl \
       emacs25-nox \
-      gcc \
       g++ \
+      gcc \
       git \
       gnupg2 \
       make \
       net-tools \
       python \
       python3 \
+      python3-dev \
+      python3-pip \
+      python3-setuptools \
+      python3-wheel \
       rsync \
       screen \
+      shared-mime-info \
       software-properties-common \
       sudo \
       telnet \
@@ -66,7 +72,6 @@ RUN true \
 # NodeJS 9.x
 RUN true \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl \
     && curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash - \
     && apt-get install -y --no-install-recommends \
       nodejs \
@@ -110,12 +115,29 @@ RUN true \
     && composer --version \
     && groupadd -r php && useradd -r -m -g php php \
     && true
+
 ENV PATH /home/php/.composer/vendor/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
 USER php:php
 RUN composer global require laravel/installer
-
-
 USER root:root
+
+
+# Install Docker CLI tools into image
+# Using them in a container requires mapping host engine socket into container: Risky!
+# See: https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface
+RUN true \
+    && curl -fsSL "https://download.docker.com/linux/debian/gpg" | apt-key add - \
+    && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian  $(lsb_release -cs) stable" \
+    && apt-get remove -y docker-ce docker docker-engine docker.io || true \
+    && mkdir -p /var/lib/docker \
+    && rm -rf /var/lib/docker \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends docker-ce docker-compose \
+    && docker --version \
+    && docker-compose --version \
+    && rm -r /var/lib/apt/lists/* \
+    && true
+
 RUN echo 'ver () { echo -n "$@" " : " >> GSBASE.txt && "$@" >> GSBASE.txt 2>&1 ; } \
   && touch GSBASE.txt \
   && ver date \
@@ -128,4 +150,6 @@ RUN echo 'ver () { echo -n "$@" " : " >> GSBASE.txt && "$@" >> GSBASE.txt 2>&1 ;
   && ver npm --version \
   && ver php --version \
   && ver composer --version \
+  && ver docker --version \
+  && ver docker-compose --version \
   ' | /bin/bash && cat GSBASE.txt
