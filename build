@@ -5,4 +5,5 @@ set -eu
 set -o pipefail
 trap 'echo;echo "*** fail ***  :  $0";echo' ERR
 
+docker pull debian:stretch
 docker build -t hughsw/gsbase .

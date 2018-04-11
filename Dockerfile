@@ -9,6 +9,7 @@
 # Debian 9.x
 FROM debian:stretch
 
+# TOOO: Remove this legacy placement, see below where it's put in /usr/local/bin/
 # A tiny executable that pauses -- Useful for keeping a container
 # alive if commands daemonize themselves, by putting it at the end of
 # the startup script.
@@ -32,6 +33,7 @@ RUN true \
       gnupg2 \
       make \
       net-tools \
+      netcat \
       python \
       python3 \
       python3-dev \
@@ -147,6 +149,14 @@ RUN true \
     && rm -r /var/lib/apt/lists/* \
     && true
 
+# A tiny executable that pauses -- Useful for keeping a container
+# alive if commands daemonize themselves, by putting it at the end of
+# the startup script.
+COPY pause /usr/local/bin/
+
+# A shell script that waits for a port to be active, or times out;
+# useful for waiting for a service to become active
+COPY await-port.sh /usr/local/bin/
 
 # Put nutritional info into GSBASE.txt
 RUN echo 'ver () { echo -n "$@" " : " >> GSBASE.txt && "$@" >> GSBASE.txt 2>&1 ; } \
