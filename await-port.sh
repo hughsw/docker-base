@@ -27,4 +27,6 @@ getElapsed () {
 
 while [ $(getElapsed) -lt $TIMEOUT -a $(isListening) != yes ] ; do sleep $DELAY && echo . ; done
 
-[ $(isListening) = yes ]
+isAlive=$(isListening)
+echo $HOST $PORT listening=$isAlive
+[ "$isAlive" = yes ]
