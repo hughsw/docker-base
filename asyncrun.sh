@@ -10,7 +10,7 @@ asyncRun() {
     "$@" &
     pid="$!"
     cmd="$@"
-    trap "echo -e '\nStopping container PID $pid: $cmd\n' ; sleep 1 ; kill -SIGTERM $pid" SIGINT SIGTERM
+    trap "echo -e '\nStopping container PID $pid: $cmd\n' ; sleep 1 ; kill -SIGTERM $pid > /dev/null 2>&1" SIGINT SIGTERM
 
     # A signal emitted from a child while wait is running will make the wait command return with code > 128.
     # So, we wrap the wait it in a loop that continues as long as $pid is alive.
@@ -18,6 +18,7 @@ asyncRun() {
     while kill -0 $pid > /dev/null 2>&1; do
         wait
     done
+    echo
 }
 
 asyncRun "$@"
