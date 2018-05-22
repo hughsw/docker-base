@@ -67,6 +67,7 @@ RUN true \
     && curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash - \
     && apt-get install -y --no-install-recommends \
       nodejs \
+    && npm install npm@latest -g \
     && node --version \
     && npm --version \
     && rm -r /var/lib/apt/lists/* \
