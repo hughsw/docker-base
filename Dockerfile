@@ -67,11 +67,13 @@ RUN true \
     && curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash - \
     && apt-get install -y --no-install-recommends \
       nodejs \
-    && npm install npm@latest -g \
     && node --version \
     && npm --version \
     && rm -r /var/lib/apt/lists/* \
     && true
+
+#    && npm install npm@latest -g \
+
 
 # PHP 7.2
 # Based on: https://www.chris-shaw.com/blog/installing-php-7.2-on-debian-8-jessie-and-debian-9-stretch
