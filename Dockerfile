@@ -1,21 +1,26 @@
 # Debian 9.x
 FROM debian:stretch
 
-RUN echo && dpkg --list && echo 1
+RUN echo && dpkg --list && echo 2
 
-RUN true \
+RUN set -x \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
+      apt-file \
       apt-transport-https \
       apt-utils \
       ca-certificates \
+    && apt-file update \
     && apt-get install -y --no-install-recommends \
+      bash \
       curl \
       emacs25-nox \
       g++ \
       gcc \
+      gettext \
       git \
       gnupg2 \
+      jq \
       make \
       net-tools \
       netcat \
@@ -35,14 +40,21 @@ RUN true \
       unzip \
       wget \
       zip \
+    && jq --version \
     && python --version \
     && python3 --version \
     && rm -r /var/lib/apt/lists/* \
     && true
 
+# aws cli
+RUN set -x \
+    && pip3 install setuptools \
+    && pip3 install awscli --upgrade \
+    && aws --version \
+    && true
 
 # nginx 1.10 (.3)
-RUN true \
+RUN set -x \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       nginx \
@@ -52,7 +64,7 @@ RUN true \
     && true
 
 # MariaDB 10.1
-RUN true \
+RUN set -x \
     && apt-get update \
     && apt-get install -y --no-install-recommends \
       mariadb-server \
@@ -62,13 +74,14 @@ RUN true \
     && true
 
 # NodeJS 9.x
-RUN true \
+RUN set -x \
     && apt-get update \
     && curl -sL https://deb.nodesource.com/setup_9.x | sudo -E bash - \
     && apt-get install -y --no-install-recommends \
       nodejs \
     && node --version \
     && npm --version \
+    && npm cache clean --force \
     && rm -r /var/lib/apt/lists/* \
     && true
 
@@ -77,7 +90,7 @@ RUN true \
 
 # PHP 7.2
 # Based on: https://www.chris-shaw.com/blog/installing-php-7.2-on-debian-8-jessie-and-debian-9-stretch
-RUN true \
+RUN set -x \
     && curl -sSL  https://packages.sury.org/php/apt.gpg > /etc/apt/trusted.gpg.d/php.gpg \
     && echo "deb https://packages.sury.org/php/ $(lsb_release -sc) main" | tee /etc/apt/sources.list.d/php.list \
     && apt-get update \
@@ -114,7 +127,7 @@ RUN true \
 # See: https://getcomposer.org/doc/faqs/how-to-install-composer-programmatically.md
 # and read to the bottom where it talks about "commit hash".
 # Commit of 2018-05-04, Composer 1.6.5, at https://github.com/composer/getcomposer.org/commits/master
-RUN true \
+RUN set -x \
     && export COMPOSER_COMMIT_HASH=fe44bd5b10b89fbe7e7fc70e99e5d1a344a683dd \
     && wget https://raw.githubusercontent.com/composer/getcomposer.org/$COMPOSER_COMMIT_HASH/web/installer -O - -q | php -- \
     && mv composer.phar /usr/local/bin/composer \
@@ -133,11 +146,11 @@ USER root:root
 # See: https://docs.docker.com/engine/security/security/#docker-daemon-attack-surface
 #
 # See: https://github.com/docker/docker-install
-# Did:
+# Did (in the container):
 #   curl -fsSL get.docker.com -o get-docker.sh
-#   sh test-docker.sh --dry-run
+#   sh get-docker.sh --dry-run
 # Copied the indicated outputs and let them log to console
-RUN true \
+RUN set -x \
     && curl -fsSL "https://download.docker.com/linux/debian/gpg" | apt-key add - \
     && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian  $(lsb_release -cs) stable" \
     && apt-get remove -y docker-ce docker docker-engine docker.io || true \
@@ -174,22 +187,27 @@ RUN echo 'ver () { echo -n "$@" " : " >> GSBASE.txt && "$@" >> GSBASE.txt 2>&1 ;
   && touch GSBASE.txt \
   && ver date \
   && ver uname -a \
-  && ver ps --version \
-  && ver python --version \
-  && ver python3 --version \
-  && ver nginx -v \
+  \
+  && ver aws --version \
+  && ver composer --version \
+  && ver docker --version \
+  && ver docker-compose --version \
+  && ver jq --version \
   && ver mysql --version \
+  && ver nginx -v \
   && ver node --version \
   && ver npm --version \
   && ver php --version \
   && ver php-fpm7.2 --version \
   && ver php-fpm7.2 --test \
-  && ver composer --version \
-  && ver docker --version \
-  && ver docker-compose --version \
+  && ver ps --version \
+  && ver python --version \
+  && ver python3 --version \
+  \
   && ver service --status-all \
   && ver service php7.2-fpm start \
-  && ver service --status-all ; \
+  && ver service --status-all \
+  ; \
   ' | /bin/bash -eu && cat GSBASE.txt
 
 # Sigh...  The following tests worked in an earlier incarnation of the

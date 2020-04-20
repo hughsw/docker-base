@@ -2,7 +2,7 @@
 
 set -eu
 
-# Adapted from: https://github.com/docker-library/mysql/issues/47
+# Adapted from: https://github.com/docker-library/mysql/issues/47#issuecomment-147397851
 # A wrapper around "$@" to trap the SIGINT signal (Ctrl+C) and forward it to the $@ process
 # I.e.: trap SIGINT and SIGTERM signals and forward SIGTERM to the child
 
@@ -17,8 +17,10 @@ asyncRun() {
     set +e
     while kill -0 $pid > /dev/null 2>&1; do
         wait
+        code=$?
     done
     echo
 }
 
 asyncRun "$@"
+exit $code
